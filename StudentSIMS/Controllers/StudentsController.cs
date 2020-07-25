@@ -25,7 +25,16 @@ namespace StudentSIMS.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Student>>> GetStudent()
         {
-            return await _context.Student.ToListAsync();
+            var students = await _context.Student.ToListAsync();
+            foreach (Student S in students){
+                var address = _context.Address
+                           .Where(a => a.studentId == S.studentId).
+                           FirstOrDefault<Address>();
+
+                S.Address = address;
+
+            }
+            return students;
         }
 
         // GET: api/Students/5
@@ -33,6 +42,12 @@ namespace StudentSIMS.Controllers
         public async Task<ActionResult<Student>> GetStudent(int id)
         {
             var student = await _context.Student.FindAsync(id);
+            var address = _context.Address
+                           .Where( a => a.studentId == student.studentId).
+                           FirstOrDefault<Address>(); 
+
+            student.Address = address;
+
 
             if (student == null)
             {
@@ -82,7 +97,6 @@ namespace StudentSIMS.Controllers
         {
             _context.Student.Add(student);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction("GetStudent", new { id = student.studentId }, student);
         }
 
@@ -95,8 +109,11 @@ namespace StudentSIMS.Controllers
             {
                 return NotFound();
             }
-
+            var address = _context.Address
+                          .Where(a => a.studentId == student.studentId).
+                          FirstOrDefault<Address>();
             _context.Student.Remove(student);
+            _context.Address.Remove(address);
             await _context.SaveChangesAsync();
 
             return student;
