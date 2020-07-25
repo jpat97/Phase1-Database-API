@@ -31,5 +31,6 @@ namespace StudentSIMS.Models
         // assign Timestamp type to the timeCreated attribute
         [Timestamp]
         public DateTime timeCreated { get; set; }
+        public Address Address { get; set; }
     }
 }
